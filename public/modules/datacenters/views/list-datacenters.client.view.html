@@ -1,0 +1,19 @@
+<section data-ng-controller="DatacentersController" data-ng-init="find()">
+    <div class="page-header">
+        <h1>Datacenters</h1>
+    </div>
+    <div class="list-group">
+        <a data-ng-repeat="datacenter in datacenters" data-ng-href="#!/datacenters/{{datacenter._id}}" class="list-group-item">
+			<small class="list-group-item-text">
+				Posted on
+				<span data-ng-bind="datacenter.created | date:'medium'"></span>
+				by
+				<span data-ng-bind="datacenter.user.displayName"></span>
+			</small>
+			<h4 class="list-group-item-heading" data-ng-bind="datacenter.name"></h4>
+        </a>
+    </div>
+    <div class="alert alert-warning text-center" data-ng-hide="!datacenters.$resolved || datacenters.length">
+    	No Datacenters yet, why don't you <a href="/#!/datacenters/create">create one</a>?
+    </div>
+</section>

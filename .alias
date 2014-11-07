@@ -1,0 +1,199 @@
+
+# set proxy settings
+echo "Setting proxy for npm..."
+npm config set strict-ssl false
+npm config set proxy  http://www-proxy.cs.kadaster.nl:8082
+npm config set https-proxy  http://www-proxy.cs.kadaster.nl:8082
+echo "Done."
+echo "Setting proxy for git..."
+git config  url."https://".insteadOf git://
+git config  http.proxy  http://www-proxy.cs.kadaster.nl:8082
+git config https.proxy  https://www-proxy.cs.kadaster.nl:8082
+echo "Done."
+
+
+PATH=$PATH:~brandsr/bhr/scr
+export PATH
+
+TTY=`tty|cut -d/ -f3-`
+if [ "`type less 2>&1`" != "less not found." -a "$TTY" != "tty0" ]
+then
+  export PAGER=less
+  export LSPAGER="less -E"
+else
+  export PAGER=pg
+  export LSPAGER="pg -en"
+fi
+
+if [ -s "$MAIL" ]           # This is at Shell startup.  In normal
+then echo "$MAILMSG"        # operation, the Shell checks
+fi                          # periodically.
+
+# Aliases
+alias ...='..;..'
+alias src=_src
+alias uli=_uli
+alias df='/bin/df -hP'
+alias sys='sudo less +G /var/log/messages'
+alias sysf='sudo tail -20f /var/log/messages'
+alias lsysf='sudo less +F /var/log/messages'
+alias s='. ~/.profile'
+alias lsvg='sudo /usr/sbin/vgdisplay'
+alias lspv='sudo /usr/sbin/pvdisplay'
+alias lslv='sudo /usr/sbin/lvdisplay'
+
+alias lsif="/sbin/ifconfig -a | awk '/^\w/ || /inet addr/'"
+alias ..='_..'
+function _.. {
+  totcd=../
+  c=0
+  cds=$1
+  while [ $c -lt ${#cds} ]; do totcd=../$totcd; c=$(( $c + 1 )); done
+  cd $totcd
+}
+
+# subversion
+alias svst='svn status -u'
+alias svd='cd ~/work/develop_env'
+alias svb='cd ~/work/build_env'
+alias svt="svn st -uv | awk 'length(\$1) == 1'"
+alias svi='svn ci -m '
+alias svu='svn update '
+alias mk-rpm-tree=_mk-rpm-tree
+alias mk-build-env=~/work/develop_env/rabo-rpm-default/scripts/mk-build-env.bash
+
+alias chksu='sudo -l | tr , \\n'
+alias nmon='ksh -c "TERM=ansi;export NMON=ct;/usr/local/sbin/nmon"'
+
+alias sl='sudo ls'
+alias scat='sudo cat'
+
+function _l
+{
+  ls -alF $* | $LSPAGER
+}
+alias l=_l
+
+function _psg
+{
+  if [ $# -eq 0 ]
+  then
+    ps -ef | $LSPAGER
+  else
+    ps -ef | grep $* | $LSPAGER
+  fi
+}
+alias psg=_psg
+
+function _vi
+{
+  PROCS=`fuser /var/tmp/Ex* 2>/dev/null | tr ' ' ','`
+  if [ `expr length "$PROCS"` -gt 1 ]
+  then
+    ps -p "$PROCS" -o user,args
+    echo "Continue (y/n) ? \c"
+    read a
+  else
+    a=Y
+  fi
+  if [ `expr "$a" : "[Yy]"` -eq 1 ]
+  then
+    /usr/bin/vim $*
+  fi
+}
+alias vi=_vi
+
+echo "--------------------------------------------"
+echo "Current Installation level: "
+
+OS_RELEASE_RPM=base-files
+dpkg -s $OS_RELEASE_RPM | grep -Ei "architecture|version:"
+
+echo "--------------------------------------------"
+echo "Current Kernel level:"
+uname -roiv | awk -F '[- ]' '{ 
+  printf "Name        : %s\nVersion     : %-27s %12s: %s\n", $NF,$1,"Architecture",$(NF-1) ;
+  printf "Release     : %-27s %12s: %s\n",$2,"Build date",$5" "$7" "$6" "$10" "$8 }'
+echo "--------------------------------------------"
+
+function _uli
+{
+  sudo `cat /etc/usr_local_install.map | awk -F"[ -]" '{ print "mount -o"$3" "$4" "$1 }'`
+}
+
+function choose_list
+{
+CHOOSE=
+SIZELIST=`echo "$LIST" | awk 'END { print NR }'`
+if [ $SIZELIST -gt 1 ]
+then
+  ansok=0
+        anslist=1-${SIZELIST}q
+  while [[ $ansok -eq 0 ]]
+  do
+    echo "Choose desired nr from list:"
+    echo "$LIST"| awk '{ print " "NR": "$1 }'
+    echo -e "Entry (1-$SIZELIST or q to quit): \c"
+    read ans
+    if expr "$ans" : "[$anslist]" > /dev/null
+    then
+      ansok=1
+    fi
+  done   
+
+  if [[ "$ans" != "q" ]]
+  then
+          CHOOSE=`echo "$LIST"| awk 'NR == '$ans`
+  fi
+else
+  CHOOSE=$LIST
+fi
+ 
+}
+
+function _src
+{
+  LIST=`ls -d /appl/svn/*/*/hooks | cut -d/ -f-5`
+  choose_list
+  if [[ ! -z "$CHOOSE" ]]; then
+    base_repo=$CHOOSE
+    LIST=`svn list file://$CHOOSE | cut -d/ -f1`
+    choose_list
+    if [[ ! -z "$CHOOSE" ]]; then
+      base_repo=file://$base_repo/$CHOOSE/trunk
+      echo "\$base_repo set to $base_repo"
+    fi
+  fi
+
+}
+
+
+PS1_SIGN="%"
+export BON="[1m"
+h=$(hostname)
+if [[ "${h%%[0-9]*}" == "csu" || "${h%%[0-9]*}" == "bhru" ]]; then
+  export BON="[31;1m"
+fi
+export BOFF="[m"
+export ESCTITEL="]0;${LOGNAME}@$(hostname| cut -d. -f1) $PS1_SIGN "
+
+PS1_BEGIN="$ESCTITEL$PWD[$BON"
+PS1_VAR="$BOFF] "
+PS1_LAST="
+ $PS1_SIGN"
+  
+PS1="${PS1_BEGIN}\u@\h${PS1_VAR}\w ${PS1_LAST} "
+function _cd
+{
+  cd $*
+  REALPWD=`/bin/pwd`
+  if [ "$REALPWD" != "$PWD" ]
+  then
+    echo "$PWD -> $REALPWD"
+    cd - >/dev/null
+    cd $REALPWD
+  fi
+  PS1_BEGIN="$ESCTITEL$PWD[$BON"
+  PS1="${PS1_BEGIN}\u@\h$PS1_VAR\w ${PS1_LAST} "
+}
+alias cd=_cd

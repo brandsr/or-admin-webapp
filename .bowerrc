@@ -1,0 +1,6 @@
+{
+    "strict-ssl": false,
+    "proxy":"http://www-proxy.cs.kadaster.nl:8082",
+    "https-proxy":"http://www-proxy.cs.kadaster.nl:8082",
+    "directory": "public/lib"
+}

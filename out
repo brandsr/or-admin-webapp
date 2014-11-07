@@ -1,0 +1,28 @@
+[4mRunning "jshint:all" (jshint) task[24m
+[32m>> [39m63 files lint free.
+
+[4mRunning "csslint:all" (csslint) task[24m
+[32m>> [39m2 files lint free.
+
+[4mRunning "concurrent:default" (concurrent) task[24m
+[4mRunning "watch" task[24m
+Waiting...
+[4mRunning "nodemon:dev" (nodemon) task[24m
+[33m[nodemon] v1.2.1[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching: app/views/**/*.* gruntfile.js server.js config/**/*.js app/**/*.js[39m
+[32m[nodemon] starting `node --debug server.js`[39m
+
+[0m
+MEAN.JS application started on port 3000
+[0mGET /modules/core/img/brand/favicon.ico [36m304 [0m30.756 ms - -[0m
+[0mGET /datacenters [36m304 [0m39.751 ms - -[0m
+[0mGET /modules/users/views/settings/edit-profile.client.view.html [32m200 [0m11.238 ms - -[0m
+[0mGET /modules/core/img/brand/favicon.ico [36m304 [0m4.488 ms - -[0m
+[0mGET /modules/users/views/settings/social-accounts.client.view.html [32m200 [0m5.750 ms - -[0m
+[0mGET /modules/core/img/brand/favicon.ico [36m304 [0m2.965 ms - -[0m
+[0mGET /modules/core/img/brand/favicon.ico [36m304 [0m8.596 ms - -[0m
+[0mGET /modules/users/views/settings/change-password.client.view.html [32m200 [0m12.218 ms - -[0m
+[0mGET /modules/core/img/brand/favicon.ico [36m304 [0m7.112 ms - -[0m
+[0mGET /modules/datacenters/views/create-datacenter.client.view.html [32m200 [0m10.634 ms - 881[0m
+[31mFatal error: write EPIPE[39m
